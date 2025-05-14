@@ -1,0 +1,32 @@
+// enble signal generator
+
+module en_gen (
+    clk     : input  clock,
+    rst     : input  reset,
+    en_1hz  : output logic,
+    mask_1hz: output logic,
+) {
+    var cnt100M: logic<27>;
+    var en_2hz : logic    ;
+
+    always_ff {
+        if_reset {
+            cnt100M  = '0;
+            en_1hz   = 0;
+            en_2hz   = 0;
+            mask_1hz = 0;
+        } else {
+            cnt100M = if cnt100M == 99999999 ? 0 : cnt100M + 1;
+
+            en_1hz = cnt100M == 99999999;
+            en_2hz = cnt100M == 99999999 || cnt100M == 49999999;
+
+            if en_2hz {
+                mask_1hz ^= 1;
+            }
+        }
+    }
+}
+
+#[test(tb_en_gen)]
+include (inline, "tb/tb_en_gen.sv");
