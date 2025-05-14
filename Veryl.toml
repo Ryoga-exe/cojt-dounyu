@@ -1,0 +1,12 @@
+[project]
+name = "cojt_dounyu"
+version = "0.1.0"
+repository = "https://github.com/Ryoga-exe/cojt-dounyu"
+
+[build]
+source = "src"
+target = { type = "directory", path = "target" }
+implicit_parameter_types = ["string"]
+
+[test]
+
