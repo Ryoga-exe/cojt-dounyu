@@ -6,7 +6,11 @@ repository = "https://github.com/Ryoga-exe/cojt-dounyu"
 [build]
 source = "src"
 target = { type = "directory", path = "target" }
+omit_project_prefix = true
 implicit_parameter_types = ["string"]
 
 [test]
+waveform_target = { type = "directory", path = "wave" }
 
+[test.verilator]
+compile_args = ["--timescale", "1ns/1ns"]

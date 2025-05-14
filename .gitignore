@@ -1,4 +1,5 @@
 .build/
 dependencies/
 target/
+wave/
 *.f
