@@ -1,0 +1,30 @@
+// 7-segment LED single-digit display data decoder
+
+module led7_dec (
+    disp_data: input  logic<4>,
+    disp_en  : input  logic   ,
+    segment  : output logic<7>,
+) {
+    always_comb {
+        if disp_en {
+            segment = case disp_data {
+                0      : 7'b1000000,
+                1      : 7'b1111001,
+                2      : 7'b0100100,
+                3      : 7'b0110000,
+                4      : 7'b0011001,
+                5      : 7'b0010010,
+                6      : 7'b0000010,
+                7      : 7'b1111000,
+                8      : 7'b0000000,
+                9      : 7'b0010000,
+                default: '1,
+            };
+        } else {
+            segment = '1;
+        }
+    }
+}
+
+#[test(tb_seg7_dec)]
+include (inline, "tb/tb_seg7_dec.sv");
