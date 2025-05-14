@@ -1,5 +1,0 @@
-module ModuleA {
-    initial {
-        $display("Hello, world!");
-    }
-}

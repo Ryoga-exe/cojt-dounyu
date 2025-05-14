@@ -1,0 +1,43 @@
+// display data selector
+
+module disp_sel (
+    mode_ms : input logic   ,
+    hour_hi : input logic<7>,
+    hour_lo : input logic<7>,
+    min_hi  : input logic<7>,
+    min_lo  : input logic<7>,
+    sec_hi  : input logic<7>,
+    sec_lo  : input logic<7>,
+    hour_bin: input logic<5>,
+    sec_bin : input logic<6>,
+
+    disp3   : output logic<7>,
+    disp2   : output logic<7>,
+    disp1   : output logic<7>,
+    disp0   : output logic<7>,
+    hour_led: output logic<5>,
+    sec_led : output logic<6>,
+) {
+    always_comb {
+        if mode_ms == 0 {
+            // Minute-second mode
+            disp3    = hour_hi;
+            disp2    = hour_lo;
+            disp1    = min_hi;
+            disp0    = min_lo;
+            hour_led = '0;
+            sec_led  = sec_bin;
+        } else {
+            // Hour-minute mode
+            disp3    = min_hi;
+            disp2    = min_lo;
+            disp1    = sec_hi;
+            disp0    = sec_lo;
+            hour_led = hour_bin;
+            sec_led  = '0;
+        }
+    }
+}
+
+#[test(tb_disp_sel)]
+include (inline, "tb/tb_disp_sel.sv");
