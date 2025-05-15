@@ -1,0 +1,52 @@
+// 24-decimal counter
+
+module cnt24 (
+    clk    : input clock,
+    rst    : input reset,
+    cnt_en : input logic,
+    cnt_inc: input logic,
+
+    cnt_hi : output logic<2>,
+    cnt_lo : output logic<4>,
+    cnt_bin: output logic<5>,
+) {
+    var cnt: logic<5>;
+
+    always_ff {
+        if_reset {
+            cnt = '0;
+        } else {
+            if cnt_en || cnt_inc {
+                cnt = if cnt == 23 ? 0 : cnt + 1;
+            }
+        }
+    }
+
+    assign cnt_bin = cnt;
+
+    always_comb {
+        var tmp: logic<5>;
+        switch {
+            cnt <: 10: {
+                           cnt_hi = 0;
+                           tmp    = cnt;
+                       }
+            inside cnt {10..20}: {
+                                     cnt_hi = 1;
+                                     tmp    = cnt - 5'd10;
+                                 }
+            inside cnt {20..24}: {
+                                     cnt_hi = 2;
+                                     tmp    = cnt - 5'd20;
+                                 }
+            default: {
+                         cnt_hi = 0;
+                         tmp    = 0;
+                     }
+        }
+        cnt_lo = tmp[3:0];
+    }
+}
+
+#[test(tb_cnt24)]
+include (inline, "tb/tb_cnt24.sv");

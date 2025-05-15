@@ -10,6 +10,7 @@ clock_type = "posedge"
 reset_type = "sync_high"
 omit_project_prefix = true
 implicit_parameter_types = ["string"]
+expand_inside_operation = true
 
 [test]
 waveform_target = { type = "directory", path = "wave" }
