@@ -1,0 +1,166 @@
+/// clock24
+module clock24 (
+    clk     : input clock,
+    rst     : input reset,
+    btnr    : input logic,
+    btnl    : input logic,
+    btnu    : input logic,
+    en4sim  : input logic,
+    mask4sim: input logic,
+
+    disp0   : output logic<7>,
+    disp1   : output logic<7>,
+    disp2   : output logic<7>,
+    disp3   : output logic<7>,
+    hour_led: output logic<5>,
+    sec_led : output logic<6>,
+) {
+    var en_1hz    : logic;
+    var mask_1hz  : logic;
+    var x_en_1hz  : logic;
+    var x_mask_1hz: logic;
+
+    var min_inc  : logic   ;
+    var hour_inc : logic   ;
+    var s_hi     : logic<3>;
+    var s_lo     : logic<4>;
+    var s_bin    : logic<6>;
+    var s_co     : logic   ;
+    var m_hi     : logic<3>;
+    var m_lo     : logic<4>;
+    var m_bin    : logic<6>;
+    var m_co     : logic   ;
+    var h_hi     : logic<2>;
+    var h_lo     : logic<4>;
+    var h_bin    : logic<5>;
+    var mode_ms  : logic   ;
+    var sec_rst  : logic   ;
+    var disp_en_h: logic   ;
+    var disp_en_m: logic   ;
+    var disp_en_s: logic   ;
+
+    var hour_hi: logic<7>;
+    var hour_lo: logic<7>;
+    var min_hi : logic<7>;
+    var min_lo : logic<7>;
+    var sec_hi : logic<7>;
+    var sec_lo : logic<7>;
+
+    assign x_en_1hz   = en_1hz | en4sim;
+    assign x_mask_1hz = mask_1hz | mask4sim;
+
+    inst i_en_gen: en_gen (
+        clk               ,
+        rst               ,
+        en_1hz  : en_1hz  ,
+        mask_1hz: mask_1hz,
+    );
+
+    inst i_sec: cnt60 (
+        clk              ,
+        rst              ,
+        cnt_en : x_en_1hz,
+        cnt_inc: 1'b0    ,
+        cnt_hi : s_hi    ,
+        cnt_lo : s_lo    ,
+        cnt_bin: s_bin   ,
+        co     : s_co    ,
+    );
+
+    inst i_min: cnt60 (
+        clk                     ,
+        rst                     ,
+        cnt_en : s_co & x_en_1hz,
+        cnt_inc: min_inc        ,
+        cnt_hi : m_hi           ,
+        cnt_lo : m_lo           ,
+        cnt_bin: m_bin          ,
+        co     : m_co           ,
+    );
+
+    inst i_hour: cnt24 (
+        clk                            ,
+        rst                            ,
+        cnt_en : s_co & m_co & x_en_1hz,
+        cnt_inc: hour_inc              ,
+        cnt_hi : h_hi                  ,
+        cnt_lo : h_lo                  ,
+        cnt_bin: h_bin                 ,
+    );
+
+    inst i_ctrl_gen: ctrl_gen (
+        clk        ,
+        rst        ,
+        btnr       ,
+        btnl       ,
+        btnu       ,
+        mask_1hz   ,
+        mode_ms    ,
+        hour_inc   ,
+        min_inc    ,
+        sec_rst    ,
+        disp_en_h  ,
+        disp_en_m  ,
+        disp_en_s  ,
+    );
+
+    inst i_hour_hi: led7_dec (
+        disp_data: h_hi as 4,
+        disp_en  : disp_en_h,
+        segment  : hour_hi  ,
+    );
+
+    inst i_hour_lo: led7_dec (
+        disp_data: h_lo     ,
+        disp_en  : disp_en_h,
+        segment  : hour_lo  ,
+    );
+
+    inst i_min_hi: led7_dec (
+        disp_data: m_hi as 4,
+        disp_en  : disp_en_m,
+        segment  : min_hi   ,
+    );
+
+    inst i_min_lo: led7_dec (
+        disp_data: m_lo     ,
+        disp_en  : disp_en_m,
+        segment  : min_lo   ,
+    );
+
+    inst i_sec_hi: led7_dec (
+        disp_data: s_hi as 4,
+        disp_en  : disp_en_s,
+        segment  : sec_hi   ,
+    );
+
+    inst i_sec_lo: led7_dec (
+        disp_data: s_lo     ,
+        disp_en  : disp_en_s,
+        segment  : sec_lo   ,
+    );
+
+    inst i_disp_sel: disp_sel (
+        mode_ms                           ,
+        hour_hi                           ,
+        hour_lo                           ,
+        min_hi                            ,
+        min_lo                            ,
+        sec_hi                            ,
+        sec_lo                            ,
+        hour_bin: if disp_en_h ? h_bin : 0,
+        sec_bin : if disp_en_s ? s_bin : 0,
+        disp3                             ,
+        disp2                             ,
+        disp1                             ,
+        disp0                             ,
+        hour_led                          ,
+        sec_led                           ,
+    );
+}
+
+#[test(tb_clock24_1)]
+include (inline, "tb/tb_clock24_1.sv");
+
+#[test(tb_clock24_2)]
+include (inline, "tb/tb_clock24_2.sv");
