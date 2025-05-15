@@ -1,6 +1,5 @@
-// 24-decimal counter
-
-module cnt24 (
+/// 24-decimal counter
+pub module cnt24 (
     clk    : input clock,
     rst    : input reset,
     cnt_en : input logic,
