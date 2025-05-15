@@ -58,6 +58,5 @@ module cnt60 (
     }
 }
 
-
 #[test(tb_cnt60)]
 include (inline, "tb/tb_cnt60.sv");
