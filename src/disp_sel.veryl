@@ -1,6 +1,5 @@
-// display data selector
-
-module disp_sel (
+/// display data selector
+pub module disp_sel (
     mode_ms : input logic   ,
     hour_hi : input logic<7>,
     hour_lo : input logic<7>,
