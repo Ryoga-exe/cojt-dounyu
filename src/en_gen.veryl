@@ -1,6 +1,5 @@
-// enble signal generator
-
-module en_gen (
+/// enble signal generator
+pub module en_gen (
     clk     : input  clock,
     rst     : input  reset,
     en_1hz  : output logic,
