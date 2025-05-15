@@ -1,6 +1,5 @@
-// 7-segment LED single-digit display data decoder
-
-module led7_dec (
+/// 7-segment LED single-digit display data decoder
+pub module led7_dec (
     disp_data: input  logic<4>,
     disp_en  : input  logic   ,
     segment  : output logic<7>,
