@@ -1,6 +1,5 @@
-// sexagesimal counter
-
-module cnt60 (
+/// sexagesimal counter
+pub module cnt60 (
     clk    : input clock,
     rst    : input reset,
     cnt_en : input logic,
