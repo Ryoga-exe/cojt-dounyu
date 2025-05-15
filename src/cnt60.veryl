@@ -1,0 +1,63 @@
+// sexagesimal counter
+
+module cnt60 (
+    clk    : input clock,
+    rst    : input reset,
+    cnt_en : input logic,
+    cnt_inc: input logic,
+
+    cnt_hi : output logic<3>,
+    cnt_lo : output logic<4>,
+    cnt_bin: output logic<6>,
+    co     : output logic   ,
+) {
+    var cnt: logic<6>;
+
+    always_ff {
+        if_reset {
+            cnt = '0;
+        } else {
+            if cnt_en || cnt_inc {
+                cnt = if cnt == 59 ? 0 : cnt + 1;
+            }
+        }
+    }
+
+    assign cnt_bin = cnt;
+    assign co      = cnt_bin == 59;
+
+    always_comb {
+        var tmp: logic<6>;
+        switch {
+            cnt <: 10: {
+                           cnt_hi = 0;
+                           tmp    = cnt;
+                       }
+            inside cnt {10..20}: {
+                                     cnt_hi = 1;
+                                     tmp    = cnt - 10;
+                                 }
+            inside cnt {20..30}: {
+                                     cnt_hi = 2;
+                                     tmp    = cnt - 20;
+                                 }
+            inside cnt {30..40}: {
+                                     cnt_hi = 3;
+                                     tmp    = cnt - 30;
+                                 }
+            inside cnt {40..50}: {
+                                     cnt_hi = 4;
+                                     tmp    = cnt - 40;
+                                 }
+            inside cnt {50..60}: {
+                                     cnt_hi = 5;
+                                     tmp    = cnt - 50;
+                                 }
+        }
+        cnt_lo = tmp[3:0];
+    }
+}
+
+
+#[test(tb_cnt60)]
+include (inline, "tb/tb_cnt60.sv");
