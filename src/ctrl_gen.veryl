@@ -1,6 +1,5 @@
-// control signal generator
-
-module ctrl_gen (
+/// control signal generator
+pub module ctrl_gen (
     clk     : input clock,
     rst     : input reset,
     btnr    : input logic,
