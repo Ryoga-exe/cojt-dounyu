@@ -46,6 +46,8 @@ module clock24 (
     var sec_hi : logic<7>;
     var sec_lo : logic<7>;
 
+    let sec_reset: reset = rst | sec_rst;
+
     assign x_en_1hz   = en_1hz | en4sim;
     assign x_mask_1hz = mask_1hz | mask4sim;
 
@@ -57,14 +59,14 @@ module clock24 (
     );
 
     inst i_sec: cnt60 (
-        clk              ,
-        rst              ,
-        cnt_en : x_en_1hz,
-        cnt_inc: 1'b0    ,
-        cnt_hi : s_hi    ,
-        cnt_lo : s_lo    ,
-        cnt_bin: s_bin   ,
-        co     : s_co    ,
+        clk               ,
+        rst    : sec_reset,
+        cnt_en : x_en_1hz ,
+        cnt_inc: 1'b0     ,
+        cnt_hi : s_hi     ,
+        cnt_lo : s_lo     ,
+        cnt_bin: s_bin    ,
+        co     : s_co     ,
     );
 
     inst i_min: cnt60 (

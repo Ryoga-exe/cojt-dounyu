@@ -34,92 +34,102 @@ pub module ctrl_gen (
 
     always_ff {
         if_reset {
-            next_state     = State::Normal;
-            next_mode_ms   = 0;
-            next_hour_inc  = 0;
-            next_min_inc   = 0;
-            next_sec_rst   = 0;
-            next_disp_en_h = 1;
-            next_disp_en_m = 1;
-            next_disp_en_s = 1;
+            curr_state = State::Normal;
+            mode_ms    = 0;
+            hour_inc   = 0;
+            min_inc    = 0;
+            sec_rst    = 0;
+            disp_en_h  = 1;
+            disp_en_m  = 1;
+            disp_en_s  = 1;
         } else {
-            // NOTE:
-            // `switch` statement nested inside `case` causes mis-aligned indentation format.
-            // https://github.com/veryl-lang/veryl/issues/1629
-            // Therefore, I avoid using switch inside case blocks here as a workaround.
-            case curr_state {
-                State::Normal: {
-                                   next_state = switch {
-                                       btnr   : State::Normal,
-                                       btnl   : State::Sec,
-                                       default: State::Normal,
-                                   };
-                                   next_mode_ms   = if btnr ? ~mode_ms : mode_ms;
-                                   next_hour_inc  = 0;
-                                   next_min_inc   = 0;
-                                   next_sec_rst   = 0;
-                                   next_disp_en_h = 1;
-                                   next_disp_en_m = 1;
-                                   next_disp_en_s = if btnl ? mask_1hz : 1;
-                               }
-                State::Sec: {
-                                next_state = switch {
-                                    btnr   : State::Min,
-                                    btnl   : State::Normal,
-                                    btnu   : State::Sec,
-                                    default: State::Sec,
-                                };
-                                next_mode_ms   = mode_ms;
-                                next_hour_inc  = 0;
-                                next_min_inc   = 0;
-                                next_sec_rst   = btnu;
-                                next_disp_en_h = 1;
-                                next_disp_en_m = if btnr ? mask_1hz : 1;
-                                next_disp_en_s = if btnr || btnl ? 1 : mask_1hz;
-                            }
-                State::Min: {
-                                next_state = switch {
-                                    btnr   : State::Hour,
-                                    btnl   : State::Normal,
-                                    btnu   : State::Min,
-                                    default: State::Min,
-                                };
-                                next_mode_ms   = mode_ms;
-                                next_hour_inc  = 0;
-                                next_min_inc   = btnu;
-                                next_sec_rst   = 0;
-                                next_disp_en_h = if btnr ? mask_1hz : 1;
-                                next_disp_en_m = if btnr || btnl ? 1 : mask_1hz;
-                                next_disp_en_s = 1;
-                            }
-                State::Hour: {
-                                 next_state = switch {
-                                     btnr   : State::Sec,
-                                     btnl   : State::Normal,
-                                     btnu   : State::Hour,
-                                     default: State::Hour,
-                                 };
-                                 next_mode_ms   = mode_ms;
-                                 next_hour_inc  = btnu;
-                                 next_min_inc   = 0;
-                                 next_sec_rst   = 0;
-                                 next_disp_en_h = if btnr || btnl ? 1 : mask_1hz;
-                                 next_disp_en_m = 1;
-                                 next_disp_en_s = if btnr ? mask_1hz : 1;
-                             }
-            }
+            curr_state = next_state;
+            mode_ms    = next_mode_ms;
+            hour_inc   = next_hour_inc;
+            min_inc    = next_min_inc;
+            sec_rst    = next_sec_rst;
+            disp_en_h  = next_disp_en_h;
+            disp_en_m  = next_disp_en_m;
+            disp_en_s  = next_disp_en_s;
         }
     }
 
     always_comb {
-        curr_state = next_state;
-        mode_ms    = next_mode_ms;
-        hour_inc   = next_hour_inc;
-        min_inc    = next_min_inc;
-        sec_rst    = next_sec_rst;
-        disp_en_h  = next_disp_en_h;
-        disp_en_m  = next_disp_en_m;
-        disp_en_s  = next_disp_en_s;
+        // NOTE:
+        // `switch` statement nested inside `case` causes mis-aligned indentation format.
+        // https://github.com/veryl-lang/veryl/issues/1629
+        // Therefore, I avoid using switch inside case blocks here as a workaround.
+        case curr_state {
+            State::Normal: {
+                               next_state = switch {
+                                   btnr   : State::Normal,
+                                   btnl   : State::Sec,
+                                   default: State::Normal,
+                               };
+                               next_mode_ms   = if btnr ? ~mode_ms : mode_ms;
+                               next_hour_inc  = 0;
+                               next_min_inc   = 0;
+                               next_sec_rst   = 0;
+                               next_disp_en_h = 1;
+                               next_disp_en_m = 1;
+                               next_disp_en_s = if btnl ? mask_1hz : 1;
+                           }
+            State::Sec: {
+                            next_state = switch {
+                                btnr   : State::Min,
+                                btnl   : State::Normal,
+                                btnu   : State::Sec,
+                                default: State::Sec,
+                            };
+                            next_mode_ms   = mode_ms;
+                            next_hour_inc  = 0;
+                            next_min_inc   = 0;
+                            next_sec_rst   = btnu;
+                            next_disp_en_h = 1;
+                            next_disp_en_m = if btnr ? mask_1hz : 1;
+                            next_disp_en_s = if btnr || btnl ? 1 : mask_1hz;
+                        }
+            State::Min: {
+                            next_state = switch {
+                                btnr   : State::Hour,
+                                btnl   : State::Normal,
+                                btnu   : State::Min,
+                                default: State::Min,
+                            };
+                            next_mode_ms   = mode_ms;
+                            next_hour_inc  = 0;
+                            next_min_inc   = btnu;
+                            next_sec_rst   = 0;
+                            next_disp_en_h = if btnr ? mask_1hz : 1;
+                            next_disp_en_m = if btnr || btnl ? 1 : mask_1hz;
+                            next_disp_en_s = 1;
+                        }
+            State::Hour: {
+                             next_state = switch {
+                                 btnr   : State::Sec,
+                                 btnl   : State::Normal,
+                                 btnu   : State::Hour,
+                                 default: State::Hour,
+                             };
+                             next_mode_ms   = mode_ms;
+                             next_hour_inc  = btnu;
+                             next_min_inc   = 0;
+                             next_sec_rst   = 0;
+                             next_disp_en_h = if btnr || btnl ? 1 : mask_1hz;
+                             next_disp_en_m = 1;
+                             next_disp_en_s = if btnr ? mask_1hz : 1;
+                         }
+            default: {
+                         next_state     = State::Normal;
+                         next_mode_ms   = 0;
+                         next_hour_inc  = 0;
+                         next_min_inc   = 0;
+                         next_sec_rst   = 0;
+                         next_disp_en_h = 1;
+                         next_disp_en_m = 1;
+                         next_disp_en_s = 1;
+                     }
+        }
     }
 }
 
