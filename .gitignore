@@ -2,4 +2,5 @@
 dependencies/
 target/
 wave/
+doc/
 *.f
