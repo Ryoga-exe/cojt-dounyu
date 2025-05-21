@@ -1,0 +1,143 @@
+/// push button (BTNR, BTNL, BTNU, BTND, BTNC)
+/// chattering removal, oneshot & toggle signal genrate
+pub module btn (
+    clk : input clock, /// 100MHz input clock
+    btnu: input logic, /// BTNU
+    btnr: input logic, /// BTNR
+    btnl: input logic, /// BTNL
+    btnd: input logic, /// BTND
+    btnc: input logic, /// BTNC
+
+    uone: output logic, /// BTNU oneshot
+    utgl: output logic, /// BTNU toggle
+    rone: output logic, /// BTNR oneshot
+    rtgl: output logic, /// BTNR toggle
+    lone: output logic, /// BTNL oneshot
+    ltgl: output logic, /// BTNL toggle
+    done: output logic, /// BTND oneshot
+    dtgl: output logic, /// BTND toggle
+    cone: output logic, /// BTNC oneshot
+    ctgl: output logic, /// BTNC toggle
+) {
+    var count: logic<18>;
+    var c384 : logic    ;
+    var u_in : logic<4> ;
+    var r_in : logic<4> ;
+    var l_in : logic<4> ;
+    var d_in : logic<4> ;
+    var c_in : logic<4> ;
+
+    always_ff {
+        count += 18'd1;
+        c384  =  if count == 18'h3ffff ? 1'b1 : 1'b0;
+    }
+
+    always_ff {
+        if c384 {
+            u_in[0] = btnu;
+            u_in[1] = u_in[0];
+            r_in[0] = btnr;
+            r_in[1] = r_in[0];
+            l_in[0] = btnl;
+            l_in[1] = l_in[0];
+            d_in[0] = btnd;
+            d_in[1] = d_in[0];
+            c_in[0] = btnc;
+            c_in[1] = c_in[0];
+        }
+    }
+
+    always_ff {
+        if u_in[1:0] == 2'b11 {
+            u_in[2] = 1'b1;
+        } else {
+            u_in[2] = 1'b0;
+        }
+    }
+
+    always_ff {
+        if r_in[1:0] == 2'b11 {
+            r_in[2] = 1'b1;
+        } else {
+            r_in[2] = 1'b0;
+        }
+    }
+
+    always_ff {
+        if l_in[1:0] == 2'b11 {
+            l_in[2] = 1'b1;
+        } else {
+            l_in[2] = 1'b0;
+        }
+    }
+
+    always_ff {
+        if d_in[1:0] == 2'b11 {
+            d_in[2] = 1'b1;
+        } else {
+            d_in[2] = 1'b0;
+        }
+    }
+
+    always_ff {
+        if c_in[1:0] == 2'b11 {
+            c_in[2] = 1'b1;
+        } else {
+            c_in[2] = 1'b0;
+        }
+    }
+
+    always_ff {
+        u_in[3] = u_in[2];
+        r_in[3] = r_in[2];
+        l_in[3] = l_in[2];
+        d_in[3] = d_in[2];
+        c_in[3] = c_in[2];
+    }
+
+    always_ff {
+        if u_in[3:2] == 2'b01 {
+            uone = 1'b1;
+            utgl = ~utgl;
+        } else {
+            uone = 1'b0;
+        }
+    }
+
+    always_ff {
+        if r_in[3:2] == 2'b01 {
+            rone = 1'b1;
+            rtgl = ~rtgl;
+        } else {
+            rone = 1'b0;
+        }
+    }
+
+    always_ff {
+        if l_in[3:2] == 2'b01 {
+            lone = 1'b1;
+            ltgl = ~ltgl;
+        } else {
+
+            lone = 1'b0;
+        }
+    }
+
+    always_ff {
+        if d_in[3:2] == 2'b01 {
+            done = 1'b1;
+            dtgl = ~dtgl;
+        } else {
+            done = 1'b0;
+        }
+    }
+
+    always_ff {
+        if c_in[3:2] == 2'b01 {
+            cone = 1'b1;
+            ctgl = ~ctgl;
+        } else {
+            cone = 1'b0;
+        }
+    }
+}
