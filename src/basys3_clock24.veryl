@@ -1,0 +1,79 @@
+pub module BASYS3_CLOCK24 (
+    CLKIN: input logic,
+    btnR : input logic,
+    btnL : input logic,
+    btnU : input logic,
+    btnD : input logic,
+    btnC : input logic,
+
+    an : output logic<4> ,
+    dp : output logic    ,
+    seg: output logic<7> ,
+    led: output logic<16>,
+) {
+    var clk     : clock   ;
+    var rst     : reset   ;
+    var rone    : logic   ;
+    var lone    : logic   ;
+    var uone    : logic   ;
+    var disp0   : logic<7>;
+    var disp1   : logic<7>;
+    var disp2   : logic<7>;
+    var disp3   : logic<7>;
+    var hour_led: logic<5>;
+    var sec_led : logic<6>;
+
+    assign dp  = 1'b1;
+    assign led = {hour_led, 0 repeat 5, sec_led};
+
+    // MMCM_Block Instance
+    inst i_clk_core: $sv::clk_core (
+        clk_in1 : CLKIN,
+        clk_out1: clk  ,
+    );
+
+    inst i_btn: btn (
+        clk       ,
+        btnu: btnU,
+        btnr: btnR,
+        btnl: btnL,
+        btnd: btnD,
+        btnc: btnC,
+        uone      ,
+        utgl: _   ,
+        rone      ,
+        rtgl: _   ,
+        lone      ,
+        ltgl: _   ,
+        done: rst ,
+        dtgl: _   ,
+        cone: _   ,
+        ctgl: _   ,
+    );
+
+    inst i_an_ca: $sv::an_ca (
+        clk       ,
+        disp3     ,
+        disp2     ,
+        disp1     ,
+        disp0     ,
+        an        ,
+        ca   : seg,
+    );
+
+    inst i_clock24: clock24 (
+        clk           ,
+        rst           ,
+        btnr    : rone,
+        btnl    : lone,
+        btnu    : uone,
+        en4sim  : 1'b0,
+        mask4sim: 1'b0,
+        disp0         ,
+        disp1         ,
+        disp2         ,
+        disp3         ,
+        hour_led      ,
+        sec_led       ,
+    );
+}
