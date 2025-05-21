@@ -4,14 +4,20 @@
 
 ## Test
 
-Generating waveforms file:
-
 ```
-veryl test --wave
+make test
 ```
 
 ## Build
 
 ```
-veryl build
+make build
+```
+
+## Generate Bitstream
+
+After `make build`:
+
+```
+make flow
 ```
