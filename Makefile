@@ -5,9 +5,9 @@ build:
 	$(VERYL) build
 
 test:
-	$(VERYL) test
+	$(VERYL) test --wave
 
-vivado:
+flow:
 	$(VIVADO) -mode batch -source script/vivado.tcl -nolog -nojournal
 
 clean:
