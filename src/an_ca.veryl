@@ -1,0 +1,56 @@
+/// 4 digit seven segment display for BASYS3
+pub module an_ca (
+    clk  : input clock   , /// 100MHz input clock
+    rst  : input reset   , /// reset input
+    disp3: input logic<7>, /// display data digit3
+    disp2: input logic<7>, /// display data digit2
+    disp1: input logic<7>, /// display data digit1
+    disp0: input logic<7>, /// display data digit0
+
+    an: output logic<4>, /// common signal (active lo)
+    ca: output logic<7>, /// segment data (active lo)
+) {
+    var common    : logic<4> ;
+    var count     : logic<17>;
+    var digit_rate: logic    ;
+
+    // common
+    always_ff {
+        if_reset {
+            common = 4'b1110;
+        } else {
+            if digit_rate {
+                common = {common[2:0], common[3]};
+            }
+        }
+    }
+
+    // count
+    always_ff {
+        if_reset {
+            count = 17'd0;
+        } else {
+            count += 17'd1;
+        }
+    }
+
+    // digit_rate
+    always_ff {
+        if_reset {
+            digit_rate = 1'b0;
+        } else {
+            digit_rate = if count == 17'h1ffff ? 1'b1 : 1'b0;
+        }
+    }
+
+    always_ff {
+        case common {
+            4'b1110: ca = disp0;
+            4'b1101: ca = disp1;
+            4'b1011: ca = disp2;
+            4'b0111: ca = disp3;
+            default: ca = 7'b1111111;
+        }
+        an = common;
+    }
+}

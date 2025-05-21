@@ -51,8 +51,9 @@ pub module BASYS3_CLOCK24 (
         ctgl: _   ,
     );
 
-    inst i_an_ca: $sv::an_ca (
+    inst i_an_ca: an_ca (
         clk       ,
+        rst       ,
         disp3     ,
         disp2     ,
         disp1     ,
