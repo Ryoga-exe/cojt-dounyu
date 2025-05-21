@@ -10,7 +10,6 @@ create_project $project_name $project_dir -part $part -force
 
 # Read RTL sources
 read_verilog -sv [ glob target/*.sv ]
-read_verilog -sv [ glob src/sv/*.sv ]
 
 # Import and generate clock IP
 import_ip src/ip/clk_core.xci
